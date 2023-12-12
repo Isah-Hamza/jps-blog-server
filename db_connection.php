@@ -3,7 +3,7 @@
 $host = "localhost"; // Server name
 $user = "root"; // Database username
 $password = ""; // Database password
-$database = "waitlist"; //Database name
+$database = "jps"; //Database name
 
 // Create a database connection
 $connection = mysqli_connect($host, $user, $password, $database);
