@@ -74,20 +74,160 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle GET requests (retrieve all data)
 
     // Retrieve all data from the 'blogs' table
-    $query = "SELECT * FROM blogs";
-    $result = mysqli_query($connection, $query);
+    // $query = "SELECT * FROM blogs";
+    // $result = mysqli_query($connection, $query);
 
-    if ($result) {
-        $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        $response = [
-            'data' => $data,
-        ];
-        http_response_code(200);
+    // if ($result) {
+    //     $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    //     $response = [
+    //         'data' => $data,
+    //     ];
+    //     http_response_code(200);
+    // } else {
+    //     $response = [
+    //         'error' => 'An error occurred while retrieving data.',
+    //     ];
+    //     http_response_code(500);
+    // }
+
+    // New code below
+    if (isset($_GET['id'])) {
+        // Retrieve a specific blog by ID
+        $blogId = $_GET['id'];
+        $query = "SELECT * FROM blogs WHERE id = $blogId";
+        $result = mysqli_query($connection, $query);
+
+        if ($result) {
+            $data = mysqli_fetch_assoc($result);
+            if ($data) {
+                $response = [
+                    'data' => $data,
+                ];
+                http_response_code(200);
+            } else {
+                $response = [
+                    'error' => 'Blog not found.',
+                ];
+                http_response_code(404);
+            }
+        } else {
+            $response = [
+                'error' => 'An error occurred while retrieving data.',
+            ];
+            http_response_code(500);
+        }
+    } else {
+        // Retrieve all data from the 'blogs' table
+        $query = "SELECT * FROM blogs";
+        $result = mysqli_query($connection, $query);
+
+        if ($result) {
+            $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $response = [
+                'data' => $data,
+            ];
+            http_response_code(200);
+        } else {
+            $response = [
+                'error' => 'An error occurred while retrieving data.',
+            ];
+            http_response_code(500);
+        }
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+    // Handle PATCH requests (update a specific blog by ID)
+
+    parse_str(file_get_contents("php://input"), $patchData);
+
+    if (isset($patchData['id'])) {
+        $blogId = $patchData['id'];
+
+        // Validate the input
+        $title = $patchData['title'] ?? null;
+        $body = $patchData['body'] ?? null;
+        $author = $patchData['author'] ?? null;
+        $image_url = $patchData['image'] ?? null;
+
+        if (empty($title) && empty($body) && empty($author) && empty($image_url)) {
+            $response = [
+                'error' => 'No data provided for update.',
+            ];
+            http_response_code(400);
+        } else {
+            // Construct the update query
+            $updateQuery = "UPDATE blogs SET ";
+            $updateFields = [];
+
+            if (!empty($title)) {
+                $updateFields[] = "title = '$title'";
+            }
+
+            if (!empty($body)) {
+                $updateFields[] = "body = '$body'";
+            }
+
+            if (!empty($author)) {
+                $updateFields[] = "author = '$author'";
+            }
+
+            if (!empty($image_url)) {
+                $updateFields[] = "image_url = '$image_url'";
+            }
+
+            $updateQuery .= implode(", ", $updateFields);
+            $updateQuery .= " WHERE id = $blogId";
+
+            // Execute the update query
+            $result = mysqli_query($connection, $updateQuery);
+
+            if ($result) {
+                $response = [
+                    'message' => 'Blog updated successfully.',
+                ];
+                http_response_code(200);
+            } else {
+                $response = [
+                    'error' => 'An error occurred while updating the blog.',
+                ];
+                http_response_code(500);
+            }
+        }
     } else {
         $response = [
-            'error' => 'An error occurred while retrieving data.',
+            'error' => 'No blog ID provided for update.',
         ];
-        http_response_code(500);
+        http_response_code(400);
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    // Handle DELETE requests (delete a specific blog by ID)
+
+    parse_str(file_get_contents("php://input"), $deleteData);
+
+    if (isset($deleteData['id'])) {
+        $blogId = $deleteData['id'];
+
+        // Construct the delete query
+        $deleteQuery = "DELETE FROM blogs WHERE id = $blogId";
+
+        // Execute the delete query
+        $result = mysqli_query($connection, $deleteQuery);
+
+        if ($result) {
+            $response = [
+                'message' => 'Blog deleted successfully.',
+            ];
+            http_response_code(200);
+        } else {
+            $response = [
+                'error' => 'An error occurred while deleting the blog.',
+            ];
+            http_response_code(500);
+        }
+    } else {
+        $response = [
+            'error' => 'No blog ID provided for delete.',
+        ];
+        http_response_code(400);
     }
 } else {
     $response = [
