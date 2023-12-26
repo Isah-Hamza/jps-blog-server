@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $body = $_POST['body'];
     $author = $_POST['author'];
+    $category = $_POST['category'];
     $image_url = $_POST['image'];
     $created_date = date("F j, Y");
 
