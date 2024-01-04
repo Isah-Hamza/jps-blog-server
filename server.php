@@ -12,14 +12,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
     $title = $_POST['title'];
     $body = $_POST['content'];
     $author = $_POST['author'];
     $category = $_POST['category'];
     $image_url = $_POST['image_url'];
-    $created_date = date("F j, Y");
-
+    $id = generateRandomString();
     // Validate the input
     if (empty($title) || empty($body)) {
         $response = [
@@ -48,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // }
 
         // Insert data into the database
-        $query = "INSERT INTO blogs (title, body, author, category, image_url, created_date) VALUES ('$title', '$body','$author','$category','$image_url', '$created_date')";
+        $query = "INSERT INTO blogs (id,title, body, author, category, image_url) VALUES ('$id','$title', '$body','$author','$category','$image_url')";
 
         try {
             $result = mysqli_query($connection, $query);
@@ -59,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'message' => 'One blog item created successfully.',
                     'blogId' => $blogId,
                 ];
-                http_response_code(200);
+                http_response_code(201);
             } else {
                 $response = [
                     'error' => 'An error occurred while creating the blog item.',
