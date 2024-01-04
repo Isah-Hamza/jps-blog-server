@@ -3,13 +3,21 @@ require_once './db_connection.php';
 
 header("Access-Control-Allow-Origin: *");
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PATCH, DELETE");
+    header("Access-Control-Allow-Headers: Content-Type");
+    http_response_code(200);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $title = $_POST['title'];
-    $body = $_POST['body'];
+    $body = $_POST['content'];
     $author = $_POST['author'];
     $category = $_POST['category'];
-    $image_url = $_POST['image'];
+    $image_url = $_POST['image_url'];
     $created_date = date("F j, Y");
 
     // Validate the input
@@ -20,25 +28,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
     } else {
         // Create the 'blogs' table if it doesn't exist
-        $createTableQuery = "CREATE TABLE IF NOT EXISTS blogs (
-                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                title VARCHAR(255) NOT NULL UNIQUE,
-                                body VARCHAR(2000) NOT NULL,
-                                author VARCHAR(255) NULL,
-                                created_date VARCHAR(255) NULL,
-                            )";
+        // $createTableQuery = "CREATE TABLE IF NOT EXISTS blogs (
+        //                         id INT AUTO_INCREMENT PRIMARY KEY,
+        //                         title VARCHAR(255) NOT NULL UNIQUE,
+        //                         body VARCHAR(2000) NOT NULL,
+        //                         author VARCHAR(255) NULL,
+        //                         category VARCHAR(255) NULL,
+        //                         image_url VARCHAR(255) NULL,
+        //                         created_date VARCHAR(255) NULL,
+        //                     )";
 
-        // Assuming you already have a $connection variable established elsewhere in your code
-        if (!mysqli_query($connection, $createTableQuery)) {
-            $response = [
-                'error' => 'Error creating the blogs table: ' . mysqli_error($connection),
-            ];
-            http_response_code(500);
-            exit();
-        }
+        // // Assuming you already have a $connection variable established elsewhere in your code
+        // if (!mysqli_query($connection, $createTableQuery)) {
+        //     $response = [
+        //         'error' => 'Error creating the blogs table: ' . mysqli_error($connection),
+        //     ];
+        //     http_response_code(500);
+        //     exit();
+        // }
 
         // Insert data into the database
-        $query = "INSERT INTO blogs (title, body, author, image_url, created_at) VALUES ('$title', '$body','$author','$image_url', '$created_at')";
+        $query = "INSERT INTO blogs (title, body, author, category, image_url, created_date) VALUES ('$title', '$body','$author','$category','$image_url', '$created_date')";
 
         try {
             $result = mysqli_query($connection, $query);
