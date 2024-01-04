@@ -90,26 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Handle GET requests (retrieve all data)
-
-    // Retrieve all data from the 'blogs' table
-    // $query = "SELECT * FROM blogs";
-    // $result = mysqli_query($connection, $query);
-
-    // if ($result) {
-    //     $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    //     $response = [
-    //         'data' => $data,
-    //     ];
-    //     http_response_code(200);
-    // } else {
-    //     $response = [
-    //         'error' => 'An error occurred while retrieving data.',
-    //     ];
-    //     http_response_code(500);
-    // }
-
-    // New code below
     if (isset($_GET['id'])) {
         // Retrieve a specific blog by ID
         $blogId = $_GET['id'];
@@ -222,8 +202,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     parse_str(file_get_contents("php://input"), $deleteData);
 
-    if (isset($deleteData['id'])) {
-        $blogId = $deleteData['id'];
+    if (isset($_GET['id'])) {
+        $blogId = $_GET['id'];
 
         // Construct the delete query
         $deleteQuery = "DELETE FROM blogs WHERE id = $blogId";
