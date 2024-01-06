@@ -138,12 +138,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     parse_str(file_get_contents("php://input"), $patchData);
 
-    if (isset($patchData['id'])) {
-        $blogId = $patchData['id'];
+    if (isset($_GET['id'])) {
+        $blogId = $_GET['id'];
 
         // Validate the input
         $title = $patchData['title'] ?? null;
-        $body = $patchData['body'] ?? null;
+        $body = $patchData['content'] ?? null;
         $author = $patchData['author'] ?? null;
         $image_url = $patchData['image'] ?? null;
 
